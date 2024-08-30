@@ -19,7 +19,7 @@ async function validateUserId(req, res, next) {
       req.user = user;
       next();
     }
-  }catch (err) {
+  }catch (error) {
     res.status(500).json({
       message: 'error getting user'
     })
@@ -44,7 +44,15 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-
+  const { text } = req.body;
+  if(!text || !text.trim()) {
+    res.status(400).json({
+      message: 'missing required text field'
+    })
+  } else {
+    req.text = text.trim();
+    next();
+  }
 }
 
 // do not forget to expose these functions to other modules
@@ -52,4 +60,5 @@ module.exports = {
   logger,
   validateUserId, 
   validateUser,
+  validatePost
 };

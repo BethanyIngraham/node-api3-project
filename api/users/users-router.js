@@ -6,21 +6,20 @@ const Users = require('./users-model');
 const Posts = require('../posts/posts-model');
 const { 
   validateUserId,
-  validateUser 
+  validateUser,
+  validatePost,
 } = require('../middleware/middleware');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
   try {
     const users = await Users.get();
     res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: 'Error getting users'
-    })
-  }
+  } catch(error) {
+    next(error)
+  } 
 });
 
 router.get('/:id', validateUserId, (req, res) => {
@@ -29,10 +28,15 @@ router.get('/:id', validateUserId, (req, res) => {
     res.status(200).json(req.user);
 });
 
-router.post('/', validateUser, (req, res) => {
+router.post('/', validateUser, async (req, res, next) => {
   // RETURN THE NEWLY CREATED USER OBJECT
   // this needs a middleware to check that the request body is valid
-  console.log(req.name)
+  try {
+    const createdUser = await Users.insert({ name: req.name})
+    res.status(201).json(createdUser)
+  } catch (error) {
+    next(error)
+  }
 });
 
 router.put('/:id', validateUserId, validateUser, (req, res) => {
@@ -55,12 +59,19 @@ router.get('/:id/posts', validateUserId, (req, res) => {
   console.log(req.user)
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
   console.log(req.user)
+  console.log(req.text)
 });
+
+router.use((error, req, res, next) => { //eslint-disable-line
+  res.status(error.status || 500).json({
+    message: error.message
+  })
+})
 
 // do not forget to export the router
 module.exports = router;
