@@ -19,7 +19,7 @@ async function validateUserId(req, res, next) {
       req.user = user;
       next();
     }
-  }catch (error) {
+  } catch(error) {
     res.status(500).json({
       message: 'error getting user'
     });
