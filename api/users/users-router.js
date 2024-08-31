@@ -78,12 +78,20 @@ router.get('/:id/posts', validateUserId, async (req, res, next) => {
   }
 });
 
-router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, async (req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
-  console.log(req.user)
-  console.log(req.text)
+  try {
+    const {id} = req.params;
+    const createdPost = await Posts.insert({
+      user_id: id, 
+      text: req.text
+    });
+    res.status(201).json(createdPost);
+  }catch(error) {
+    next(error);
+  }
 });
 
 router.use((error, req, res, next) => { //eslint-disable-line
