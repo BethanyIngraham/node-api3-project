@@ -9,12 +9,12 @@ function logger(req, res, next) {
 
 async function validateUserId(req, res, next) {
   try {
-    const { id } = req.params;
+    const {id} = req.params;
     const user = await Users.getById(id);
     if(!user) {
       res.status(404).json({
         message: 'user not found'
-      })
+      });
     } else {
       req.user = user;
       next();
@@ -22,12 +22,12 @@ async function validateUserId(req, res, next) {
   }catch (error) {
     res.status(500).json({
       message: 'error getting user'
-    })
+    });
   }
 }
 
 function validateUser(req, res, next) {
-  const { name } = req.body;
+  const {name} = req.body;
   if(
     name !== undefined 
     && typeof name === 'string' 
@@ -39,16 +39,16 @@ function validateUser(req, res, next) {
   } else {
     res.status(400).json({
       message: 'missing required name field'
-    })
+    });
   }
 }
 
 function validatePost(req, res, next) {
-  const { text } = req.body;
+  const {text} = req.body;
   if(!text || !text.trim()) {
     res.status(400).json({
       message: 'missing required text field'
-    })
+    });
   } else {
     req.text = text.trim();
     next();
